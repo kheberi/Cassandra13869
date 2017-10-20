@@ -65,7 +65,7 @@ public abstract class AbstractTokenTreeBuilder implements TokenTreeBuilder
     public int serializedSize()
     {
         if (numBlocks == 1)
-            return (BLOCK_HEADER_BYTES + ((int) tokenCount * 16));
+            return (BLOCK_HEADER_BYTES + ((int) tokenCount * 16)) + OVERFLOW_TRAILER_BYTES;
         else
             return numBlocks * BLOCK_BYTES;
     }
@@ -93,6 +93,7 @@ public abstract class AbstractTokenTreeBuilder implements TokenTreeBuilder
                 }
 
                 childBlockIndex += block.childCount();
+               
             }
 
             levelIterator = (firstChild == null) ? null : firstChild.levelIterator();
@@ -321,6 +322,8 @@ public abstract class AbstractTokenTreeBuilder implements TokenTreeBuilder
             }
             return entry;
         }
+        
+       
 
         protected abstract class LeafEntry
         {
@@ -464,6 +467,11 @@ public abstract class AbstractTokenTreeBuilder implements TokenTreeBuilder
             public short offsetExtra()
             {
                 return count;
+            }
+            
+            public int overflowCount()
+            {
+            		return overflowCollisions.size();
             }
 
         }
@@ -671,5 +679,7 @@ public abstract class AbstractTokenTreeBuilder implements TokenTreeBuilder
         if ((curPos & (blockSize - 1)) != 0) // align on the block boundary if needed
             buffer.position((int) FBUtilities.align(curPos, blockSize));
     }
+    
+    
 
 }
